@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'HomeScreen.dart';
+import 'ChatScreen.dart';
 import 'Register.dart';
 
 
@@ -97,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           if (user != null) {
                             Navigator.push(context, MaterialPageRoute(
                                 builder: (BuildContext context) =>
-                                    HomeScreen()));
+                                    ChatScreen()));
                           }
                         }
                         catch (e) {

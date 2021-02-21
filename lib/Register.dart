@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'HomeScreen.dart';
+import 'ChatScreen.dart';
 
 class Register extends StatelessWidget {
 
@@ -81,7 +81,7 @@ class Register extends StatelessWidget {
                                   {
                                     'email':user.email
                                   });
-                              Navigator.push(context, MaterialPageRoute(builder:(BuildContext context) => HomeScreen()));
+                              Navigator.push(context, MaterialPageRoute(builder:(BuildContext context) => ChatScreen()));
                             }
                       }
                       catch(e){
