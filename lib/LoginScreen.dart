@@ -1,13 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_facebook_login/flutter_facebook_login.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'ChatScreen.dart';
 import 'Register.dart';
-
+import 'package:firebase_core/firebase_core.dart';
 
 class LoginScreen extends StatefulWidget {
 
@@ -20,11 +18,10 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passController = TextEditingController();
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-
+  GoogleSignIn _googleSignIn = GoogleSignIn();
 
   // FacebookLogin _facebookLogin = FacebookLogin();
   // User _user;
-
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(height: 23),
                   RaisedButton(
                     padding: EdgeInsets.only(
-                        left: 90, right: 90, top: 20, bottom: 20),
+                        left: 85, right: 85, top: 15, bottom: 15),
                     elevation: 5,
                     color: Colors.lightBlueAccent,
                     shape: RoundedRectangleBorder(
@@ -111,7 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(height: 23),
                   RaisedButton(
                     padding: EdgeInsets.only(
-                        left: 90, right: 90, top: 20, bottom: 20),
+                        left: 85, right: 85, top: 15, bottom: 15),
                     elevation: 5,
                     color: Colors.blue,
                     shape: RoundedRectangleBorder(
@@ -124,6 +121,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Text("Sign Up",
                         style: TextStyle(color: Colors.white, fontSize: 14)),
                   ),
+                  SizedBox(height: 23),
+                  GoogleSignInButton(
+                      borderRadius: 20.0,
+                      textStyle: TextStyle(fontSize: 19,color: Colors.black45),
+                      onPressed: () {
+                        setState(() {
+                          signInWithGoogle();
+                        });
+                      }),
                   // RaisedButton(
                   //   padding: EdgeInsets.only(left:90,right:90,top:20,bottom: 20),
                   //   elevation: 5,
@@ -144,6 +150,44 @@ class _LoginScreenState extends State<LoginScreen> {
         )
     );
   }
+
+  Future<String> signInWithGoogle() async {
+    await Firebase.initializeApp();
+
+    final GoogleSignInAccount googleSignInAccount = await _googleSignIn.signIn();
+    final GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount.authentication;
+
+    final AuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleSignInAuthentication.accessToken,
+      idToken: googleSignInAuthentication.idToken,
+    );
+
+    final UserCredential authResult = await firebaseAuth.signInWithCredential(credential);
+    final User user = authResult.user;
+
+    if (user != null) {
+      assert(!user.isAnonymous);
+      assert(await user.getIdToken() != null);
+
+      final User currentUser = firebaseAuth.currentUser;
+      assert(user.uid == currentUser.uid);
+
+      print('signInWithGoogle succeeded: $user');
+
+      return '$user';
+    }
+
+    return null;
+  }
+
+  // void signInWithGoogle() async{
+  //   GoogleSignInAccount googleSignInAccount = await _googleSignIn.signIn();
+  //   GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount.authentication;
+  //   AuthCredential authCredential = GoogleAuthProvider.credential(idToken: googleSignInAuthentication.idToken,accessToken: googleSignInAuthentication.accessToken);
+  //   UserCredential authResult = await firebaseAuth.signInWithCredential(authCredential);
+  //   User _user = authResult.user;
+  //   print(_user);
+  // }
 
 //   Future _handleLogin() async {
 //     FacebookLoginResult _result = await _facebookLogin.logIn(['email']);
