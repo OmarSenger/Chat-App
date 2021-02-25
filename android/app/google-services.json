@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "95254563568",
-    "project_id": "sengerchatservice",
-    "storage_bucket": "sengerchatservice.appspot.com"
+    "project_number": "453569485320",
+    "project_id": "chat-app-10e3a",
+    "storage_bucket": "chat-app-10e3a.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:95254563568:android:26de1e2cb5a4c76edcd035",
+        "mobilesdk_app_id": "1:453569485320:android:bbe19ad3f9c826f8e44fbd",
         "android_client_info": {
-          "package_name": "com.example.chat"
+          "package_name": "com.example.chat_app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "95254563568-m25v1u4qj6ho6ge1uu7rc1o3fmig1ajg.apps.googleusercontent.com",
+          "client_id": "453569485320-2ffd166m5sc3iia6lv3fu7hjdens6fh7.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCtLjjoupDFo02aVptQVJz-g2jstmOvGac"
+          "current_key": "AIzaSyBoiXvEPtQ0txkul1mFwCXf9y4pUUEz50M"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "95254563568-m25v1u4qj6ho6ge1uu7rc1o3fmig1ajg.apps.googleusercontent.com",
+              "client_id": "453569485320-2ffd166m5sc3iia6lv3fu7hjdens6fh7.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

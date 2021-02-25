@@ -4,11 +4,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'LoginScreen.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-final _firestore = FirebaseFirestore.instance;
+  final _firestore = FirebaseFirestore.instance;
 User loggedInUser ;
 
 class ChatScreen extends StatefulWidget {
@@ -43,14 +43,15 @@ class _ChatScreenState extends State<ChatScreen> {
       // ignore: missing_return
         onMessage: (Map<String, dynamic> message) {
           print('on message: $message');
-          displayNotification(message);
+          displayNotification(message['notification']);
         },
         // ignore: missing_return
-        onResume: (Map<String, dynamic> message) { // lw mnzl l app t7t
+        onResume: (Map<String, dynamic> message) {
           print('on resume:$message');
+          _firestore.collection('messages').doc();
         },
         // ignore: missing_return
-        onLaunch: (Map<String, dynamic> message) { // lw 2afl l app 5ales
+        onLaunch: (Map<String, dynamic> message) {
           Navigator.push(context, MaterialPageRoute(builder: (context)=>LoginScreen()));
         }
     );
@@ -80,16 +81,16 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _onPressed(){
-      setState(() {
-        _firestore.collection('messages').add(
-            {
-              'text':_message,
-              'sender':loggedInUser.email,
-              "time": DateTime.now()
-            });
-        _message ='';
-        _controller.clear();
-      });
+    setState(() {
+      _firestore.collection('messages').add(
+          {
+            'text':_message,
+            'sender':loggedInUser.email,
+            "time": DateTime.now()
+          });
+      _message ='';
+      _controller.clear();
+    });
   }
 
   bool isAllSpaces(_message) {
@@ -110,98 +111,98 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar:AppBar(
         automaticallyImplyLeading: false,
         title:Text('Chat'),
-          actions : <Widget>[
-      GestureDetector(
-        onTap: (){
-            _auth.signOut();
-            Navigator.push(context, MaterialPageRoute(builder:(BuildContext context) => LoginScreen()));
-        },
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text('Logout',style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold)),
-          )),
-    ],
+        actions : <Widget>[
+          GestureDetector(
+              onTap: (){
+                _auth.signOut();
+                Navigator.push(context, MaterialPageRoute(builder:(BuildContext context) => LoginScreen()));
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text('Logout',style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold)),
+              )),
+        ],
       ),
       body: SafeArea(
-       child: Column(
+        child: Column(
           children : [
-         StreamBuilder<QuerySnapshot>(
-          stream: _firestore.collection('messages').snapshots(),
-           // ignore: missing_return
-           builder:(context,snapshot){
-            if(!snapshot.hasData){
-              return Center(
-              child: CircularProgressIndicator(),
-              );
-            }
-              final messages = snapshot.data.docs.reversed;
-              List<MessageBubble> messageBubbles = [];
-              for(var message in messages){
-                final messageText = message.data()['text'];
-                final messageSender = message.data()['sender'];
-                final messageTime = message.data()['time'];
-                final currentUser = loggedInUser.email;
+            StreamBuilder<QuerySnapshot>(
+              stream: _firestore.collection('messages').snapshots(),
+              // ignore: missing_return
+              builder:(context,snapshot){
+                if(!snapshot.hasData){
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                final messages = snapshot.data.docs.reversed;
+                List<MessageBubble> messageBubbles = [];
+                for(var message in messages){
+                  final messageText = message.data()['text'];
+                  final messageSender = message.data()['sender'];
+                  final messageTime = message.data()['time'];
+                  final currentUser = loggedInUser.email;
 
-                final messageBubble = MessageBubble(text: messageText,sender: messageSender,isMe: currentUser==messageSender,time:messageTime);
-                messageBubbles.add(messageBubble);
-                messageBubbles.sort((a , b ) => b.time.compareTo(a.time));
-              }
-              return Expanded(
-                child: ListView(
-                  reverse: true,
-                  padding: EdgeInsets.symmetric(horizontal: 10,vertical: 20),
-                  children:
-                  messageBubbles,
-                ),
-              );
-            },
-         ),
-         Container(
-           alignment: Alignment.bottomCenter,
-           padding: EdgeInsets.all(5),
-           child: Row(
-            children: [
-            Expanded(
-            child:TextField(
-            controller: _controller,
-            decoration: InputDecoration(
-            hintText: 'Type Your Message',
-            filled: true,
-            fillColor: Colors.white,
-            border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(5),
-            borderSide: BorderSide(color: Colors.lightBlueAccent),
+                  final messageBubble = MessageBubble(text: messageText,sender: messageSender,isMe: currentUser==messageSender,time:messageTime);
+                  messageBubbles.add(messageBubble);
+                  messageBubbles.sort((a , b ) => b.time.compareTo(a.time));
+                }
+                return Expanded(
+                  child: ListView(
+                    reverse: true,
+                    padding: EdgeInsets.symmetric(horizontal: 10,vertical: 20),
+                    children:
+                    messageBubbles,
+                  ),
+                );
+              },
             ),
-            contentPadding: const EdgeInsets.all(10)
+            Container(
+              alignment: Alignment.bottomCenter,
+              padding: EdgeInsets.all(5),
+              child: Row(
+                children: [
+                  Expanded(
+                    child:TextField(
+                      controller: _controller,
+                      decoration: InputDecoration(
+                          hintText: 'Type Your Message',
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5),
+                            borderSide: BorderSide(color: Colors.lightBlueAccent),
+                          ),
+                          contentPadding: const EdgeInsets.all(10)
+                      ),
+                      minLines: 1,
+                      maxLines: 10,
+                      onChanged: (value){
+                        setState(() {
+                          _message = value;
+                        });
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  FlatButton(
+                      onPressed:_controller.text.isEmpty||isAllSpaces(_controller.text)?noThing:_onPressed,
+                      color: _message == null || _message.isEmpty || isAllSpaces(_message)? Colors.blueGrey : Colors.blue ,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5)
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text('Send',style: TextStyle(color: Colors.white)),
+                      )),
+                ],
+              ),
             ),
-            minLines: 1,
-            maxLines: 10,
-            onChanged: (value){
-            setState(() {
-            _message = value;
-            });
-            },
-            ),
-            ),
-            SizedBox(
-            width: 5,
-            ),
-            FlatButton(
-            onPressed:_controller.text.isEmpty||isAllSpaces(_controller.text)?noThing:_onPressed,
-            color: _message == null || _message.isEmpty || isAllSpaces(_message)? Colors.blueGrey : Colors.blue ,
-            shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(5)
-            ),
-            child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text('Send',style: TextStyle(color: Colors.white)),
-            )),
-            ],
-            ),
-         ),
-           ],
-       ),
-         ),
+          ],
+        ),
+      ),
     );
   }
   Future onSelectNotification(String payload) async {
@@ -285,10 +286,10 @@ class MessageBubble extends StatelessWidget{
               ).show(context);
             },
             child: Material(
-              borderRadius: isMe ? BorderRadius.only(topLeft: Radius.circular(30),bottomLeft: Radius.circular(30),bottomRight: Radius.circular(30)):
+                borderRadius: isMe ? BorderRadius.only(topLeft: Radius.circular(30),bottomLeft: Radius.circular(30),bottomRight: Radius.circular(30)):
                 BorderRadius.only(topRight: Radius.circular(30),bottomLeft: Radius.circular(30),bottomRight: Radius.circular(30)),
-              elevation: 5,
-              color: isMe?Colors.lightBlueAccent:Colors.grey,
+                elevation: 5,
+                color: isMe?Colors.lightBlueAccent:Colors.grey,
                 child : Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20,vertical: 10),
                   child: Text('$text',style: TextStyle(fontSize: 20,color: Colors.white)),
